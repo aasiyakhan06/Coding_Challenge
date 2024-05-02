@@ -106,20 +106,40 @@ where Customer.phoneNumber = '555-555-5555';
   select * from Customer where CustomerID not in(Select distinct CustomerID from Payment);
   
   -- 13. RETRIEVE CAR DETAILS AND THEIR TOTAL PAYMENTS.
-  
+   select Vehicle.*, sum(Payment.amount) from Vehicle
+left join Lease on Vehicle.vehicleID = Lease.vehicleID
+left join Payment on Lease.leaseID = Payment.leaseID
+group by Vehicle.vehicleID;
+
   
   -- 14. CALCULATE TOTAL PAYMENT FOR EACH CUSTOMER
-  
+  select Customer.*, sum(Payment.amount) as total_payments from Customer
+left join Lease on Customer.CustomerID = Lease.customerID
+left join Payment on Lease.leaseID = Payment.leaseID
+group by Customer.CustomerID;
   
   -- 15. LIST CAR DETAILS FOR EACH LEASE
-  
+select Lease.*, Vehicle.make, Vehicle.model from Lease
+inner join Vehicle on Lease.vehicleID = Vehicle.vehicleID;
   
   -- 16. RETRIEVE DETAILS OF ACTIVE LEASES WITH CUSTOMER AND CAR INFORMATION.
-  
+   select Lease.*, Customer.firstname, customer.lastname, Vehicle.make, Vehicle.model from Lease
+inner join Customer on Lease.customerID = Customer.CustomerID
+inner join Vehicle on Lease.vehicleID = Vehicle.vehicleID
+where curdate() >= Lease.startDate and curdate() <= Lease.endDate;
   
   -- 17. FIND THE CUSTOMER WHO HAS SPENT THE MOST ON LEASES.
-  
+  select Customer.*, sum(Payment.amount) from Customer
+inner join Lease on Customer.CustomerID = Lease.customerID
+inner join Payment on Lease.leaseID = Payment.leaseID
+group by Customer.CustomerID
+order by sum(Payment.amount) desc
+limit 1;
   
   -- 18. LIST ALL THE CARS WITH THEIR CURRENT LEASE INFORMATION.
+ select Vehicle.*, Lease.leaseID, Lease.startDate, Lease.endDate, Customer.firstname, customer.lastname from Vehicle
+left join Lease on Vehicle.vehicleID = Lease.vehicleID
+left join Customer on Lease.customerID = Customer.CustomerID
+where Lease.endDate is null or curdate() <= Lease.endDate;
   
  
